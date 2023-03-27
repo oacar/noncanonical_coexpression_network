@@ -1,0 +1,31 @@
+To get coexpression matrix:
+
+1. run script getRhoAndObs.R for each ORF using slurm script runRhoAndObs.sh
+this script takes in an index representing a given ORF (ie 1:number of ORFs) and clr transformed RNA seq data 
+for ORF_i calculates its coexpression (rho value) with all other ORFs and saves it as a one column txt file /rho/rho_i_ORFNAME.txt
+for ORF_i calculates the number of observations ie num samples expressing both ORF_i and ORF_1:ORF_numberofORFs and saves it as a one column txt file  num_obs/numobs_i_ORFNAME.txt
+2. combine all the individual columns (ie each txt file) to create coexpression matrix and number of observation matrix using combineAllMatrixColumns.R and runCombineAllMatrixColumns.sh
+outputs coexpression matrix into rho_raw5_sample400.RDS and observation matrix into numobs_raw5_sample400.RDS
+
+3. reorder columns so the matrix is symmetric (ie rownames=colnames) using reorderColumns.R
+
+4. run spqn 
+
+
+
+#################################
+on the cluster run the script:
+~/coexpression/20221110_rho/getRhoAndObs.R
+~/coexpression/20221110_rho/combineAllMatrixColumns.R
+
+using:
+~/coexpression/20221110_rho/runRhoAndObs_400.sh and combineAllMatrixColumns.sh for rho_raw5_sample400.RDS
+
+
+ie like sbatch --array [1-14168]%100 runRhoAndObs_200.sh 
+
+then reorganize the columns so they are in the same order as the rownames using the script on paris
+
+reorderColumns.R which will save the matrix in the same RDS file 
+
+then run runSpqn.R 
