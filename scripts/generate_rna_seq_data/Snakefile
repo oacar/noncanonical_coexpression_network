@@ -1,0 +1,111 @@
+
+rule all:
+    input: "spqn.RDS", "gsea.RDS"
+
+
+rule get_bed:
+    output: "all.bed"
+    shell: "Rscript getbed_all.R"
+
+rule intersect:
+    input: "all.bed"
+    output: "overlap_info.txt"
+    shell: "bedtools intersect -a {input} -b {input} -wo -s > {output}"
+
+rule getOrfs2remove:
+    input: "overlap_info.txt"
+    output: "overlapORFs2remove.RDS"
+    shell: "Rscript getOrfs2remove.R"
+
+rule getOrfCodingFasta:
+    output: "orf_coding_all_R64-2-1_20150113.fasta"
+    shell: "wget ftp://ftp.ensemblgenomes.org/pub/fungi/release-38/fasta/saccharomyces_cerevisiae/cds/Saccharomyces_cerevisiae.R64-2-1.cds.all.fa.gz; gunzip Saccharomyces_cerevisiae.R64-2-1.cds.all.fa.gz; mv Saccharomyces_cerevisiae.R64-2-1.cds.all.fa orf_coding_all_R64-2-1_20150113.fasta"
+rule getBedFasta:
+    input: "overlapORFs2remove.RDS" ,"orf_coding_all_R64-2-1_20150113.fasta" ,
+    output: "unannotated.bed" ,"annotated.bed", "annotated.fasta"
+    shell: "Rscript getBedFasta.R"
+
+#get transcript sequences for noncanonical orfs
+rule getUnannotatedSequences:
+    input: 
+        unannotated_bed="unannotated.bed",
+        reference_fasta="orf_coding_all_R64-2-1_20150113.fasta"
+
+    output: "temp.fa"
+    shell: "bedtools getfasta -fi {input.reference_fasta} -name -s -bed {input.unannotated_bed} -fo {output}"
+
+#remove the (+) or )-) that bedtools adds to transcript names
+rule removeParantheses:
+    input: "temp.fa"
+    output: "unannotated.fasta"
+    shell: "awk '{{gsub(/\(\+\)|\(\-\)/, "", $0); print}}' {input} > {output} "
+
+rule combineFasta:
+    input: "unannotated.fasta", "annotated.fasta"
+    output: "transcriptome.fa"
+    shell: "cat {input} > {output}"
+
+rule getSalmonIndex:
+    input: "transcriptome.fa"
+    output: "k_25_idx"
+    shell: "salmon index -t {input} -i {output} -k 25"    
+
+rule getFinalORFlist:
+    input: "overlapORFs2remove.RDS"
+    output: "finalORFlist.txt"
+    shell: "Rscript getFinalORFlist.R"
+
+
+
+# #run alignments
+rule run_alignment_pe:
+    input:"k_25_idx"
+    output: directory("counts/PE/")
+    shell: "bash trim_align_PE.sh"
+
+rule run_alignment_se:
+    input:"k_25_idx"
+    output: directory("counts/SE/") 
+    shell: "bash trim_align_SE.sh"
+# ./trim_align_PE.sh
+# ./trim_align_SE.sh
+
+rule get_tpm_pe:
+    input:"counts/PE/"
+    output: "RAW_counts_PE.csv"
+    shell: "Rscript get_TPM_PE.R"
+
+rule get_tpm_se:
+    input:"counts/SE/"
+    output: "RAW_counts_SE.csv"
+    shell: "Rscript get_TPM_SE.R"
+
+rule get_alignment_info_pe:
+    input:"counts/PE/"
+    output: "alignment_info_PE.txt"
+    shell: "./get_alignment_info_PE.sh"
+
+rule get_alignment_info_se:
+    input:"counts/SE/"
+    output: "alignment_info_SE.txt"
+    shell: "./get_alignment_info_SE.sh"
+
+rule get_counts:
+    input: "RAW_counts_PE.csv", "RAW_counts_SE.csv", "alignment_info_SE.txt", "alignment_info_PE.txt"
+    output: "raw_counts.RDS"
+    shell: "Rscript cleanup_expression_files.R"
+
+rule calculate_rho:
+    input: "raw_counts.RDS"
+    output: "rho.RDS"
+    shell: "Rscript getRhoAndObs.R"
+
+rule run_spqn: 
+    input: "raw_counts.RDS", "rho.RDS"
+    output: "spqn.RDS"
+    shell: "Rscript run_spqn.R"
+
+rule run_gsea:
+    input: "spqn.RDS"
+    output: "gsea.RDS"
+    shell: "Rscript run_gsea.R"
