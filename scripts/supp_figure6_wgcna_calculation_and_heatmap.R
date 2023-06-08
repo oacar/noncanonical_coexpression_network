@@ -6,11 +6,14 @@ suppressMessages(library(ggraph))
 suppressMessages(library(WGCNA))
 suppressMessages(library(ComplexHeatmap))
 
+# use following bash command to run this
+# Rscript scripts/supp_figure6_wgcna_calculation_and_heatmap.R data/interim/coexpression_matrix_rho_spqn.csv data/interim/pairwise_obs.csv 12.0 12.0_50_tree_rho_spqn.png 12.0_50_heatmap_rho_spqn.pdf adj_12.0_50_rho_spqn.csv df_12.0_50_rho_sqpn.csv 50
 args <- commandArgs(trailingOnly = TRUE)
 
 con <- DBI::dbConnect(RMariaDB::MariaDB(), groups = "mariaDB")
 respectD <- TRUE
 dynamic <- F
+# this is to run it on the R console vs as a script
 if (length(args) == 0) {
   mat_file <- "/home/oma21/coexpression/data/interim/coexpression_matrix_rho_spqn.csv"
   obs_file <- "/home/oma21/coexpression/data/interim/pairwise_obs.csv"
