@@ -1,4 +1,4 @@
-#script to figure 4D: x axis orientation of de novo ORF relative to conserved gene,
+#script to plot supp figure 13C: x axis orientation of de novo ORF relative to conserved gene,
 #y axis median expression of denovo ORF across all samples 
 #only considers ORFs that are in one orientation (ie are only within 500bp of one gene)
 #list of ORFs that are in one orientation from script get_orf_pairs_in_one_orientation.R
