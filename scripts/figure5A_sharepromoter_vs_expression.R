@@ -1,6 +1,6 @@
 #this script plots figure 5A: where x axis is whether an ORF shares a promoter with neighboring conserved gene 
 # (either by sharing at least one transcript with neighboring cORF for up and down same, or by not having overlapping TSS for up opposite orfs)
-# conserved gene as determined by TIF seq data from Pelechano et al 2013.
+# TIF seq data from Pelechano et al 2013.
 #y axis is median expression level of de novo ORF across all samples where the ORF is detected
 # graph is faceted by orientation 
 # only considers de novo ORFs that are in one orientation
