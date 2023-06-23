@@ -3,7 +3,7 @@
 #graph is faceted by orientation ie either for de novo ORFs that are upstream of a conserved gene or downstream of a conserved gene
 # TIF seq data from Pelechano et al 2013.
 #tif_info data generated in get_tif_info.R
-#overlap_TSS_info generated in get_overlap_tss_info.R
+#overlap_TSS_info generated in get_overlap_TSS_info.R
 
 library(dplyr)
 library(ggpubr)

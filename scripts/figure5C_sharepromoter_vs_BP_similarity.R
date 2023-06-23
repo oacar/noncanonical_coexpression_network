@@ -5,7 +5,7 @@
 
 
 #tif_info data generated in get_tif_info.R
-#overlap_TSS_info generated in get_overlap_tss_info.R
+#overlap_TSS_info generated in get_overlap_TSS_info.R
 #BP enrichment similarity (omer.fgsea_slim_similarity) generated in gsea_relevance_similarity.R
 #background BP enrichment similarity (omer.fgsea_slim_bp_noexponent_similarity_random) generated in gsea_jaccard_random.r
 

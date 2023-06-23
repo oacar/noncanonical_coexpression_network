@@ -9,7 +9,7 @@
 #expression_info generated in get_median_tpm.R
 #OrfsInOneOrientation generated in get_orf_pairs_in_one_orientation.R
 #orfsFarAway generated in get_far_away_orfs.R
-#overlap_TSS_info generated in get_overlap_tss_info.R
+#overlap_TSS_info generated in get_overlap_TSS_info.R
 
 library(dplyr)
 library(ggpubr)
