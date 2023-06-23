@@ -104,24 +104,34 @@ axis_text_size <- 8
 #convert contingency matrix into a data frame that contains the proportion of coexpressed pairs that form protein complex
 #proportion of non-coexpressed pairs that form protein complex
 
-getPlotdf<-function(cm){
-  cp = 100*(cm['1','1']/(cm['1','1']+cm['0','1']))
-  ncp = 100*(cm['1','0']/(cm['1','0']+cm['0','0']))
-  plot_df<-data.frame('coexpressed'=c('coexpressed','not coexpressed'),'percentage'=c(cp, ncp))
+
+getPlotdf_csv<-function(cm){
+  cm$X<-NULL
+  colnames(cm)<-c('0','1')
+  rownames(cm)<-c('0','1')
+  cp = (cm['1','1']/(cm['1','1']+cm['0','1']))
+  ncp = (cm['1','0']/(cm['1','0']+cm['0','0']))
+  plot_df<-data.frame('coexpressed'=c('coexpressed pairs','not coexpressed pairs'),
+                      'prop'=c(cp, ncp),
+                      'count'=c(cm['1','1'],cm['1','0']))
+  plot_df$se<-sqrt(plot_df$prop * (1 - plot_df$prop) / plot_df$count)
+  plot_df$prop<-plot_df$prop*100
+  plot_df$se<-plot_df$se*100
   return(plot_df)
 }
 
 
-complex_df<-getPlotdf(contingency_998rho)
-complex_stats<-pairwise_fisher_test(contingency_998rho[,1:2]) %>% add_column('coexpressed'='coexpressed')
+contingency_matrix<-contingency_998rho
+complex_df<-getPlotdf_csv(contingency_matrix)
+complex_stats<-pairwise_fisher_test(contingency_matrix[,2:3]) %>% add_column('coexpressed'='coexpressed')
 
-
-pdf(sprintf('%sCYC2008_cocomplexEnrichment_rho998.pdf',file_path),width=2.5, height = 3)
+pdf(sprintf('%sCYC2008_cocomplexEnrichment_rho998.pdf',file_path),width=2, height = 2.5)
 complex_df %>% mutate(coexpressed =case_when(coexpressed=='coexpressed pairs' ~'coexpressed',
                                              coexpressed=='not coexpressed pairs' ~'not\ncoexpressed')) %>%
-  ggbarplot( x="coexpressed", y="percentage", xlab="cORF pair type",ylab ="% of pairs in a protein complex",
-             fill = "coexpressed", color=NA, palette = c('#BFBADA','#E32726'),
-             label = FALSE)+
+  ggbarplot( x="coexpressed", y="prop", xlab="cORF pair type",ylab ="% of pairs in a protein complex",
+             fill = "coexpressed", color=NA, palette = c('#3FC1C9','#E32726'))+
+  geom_text(aes(label = format(complex_df$count, big.mark = ",")), size = 2.5, vjust = -0.5,hjust=0.5) +
+  geom_errorbar(aes(ymin = prop - se, ymax = prop + se), width = 0.2, color = "black") +
   stat_pvalue_manual(complex_stats, x='coexpressed', label="p.adj.signif",y.position=10, size = significance_size)+
   font("x.text", size = axis_text_size) +
   font("y.text", size = axis_text_size) +

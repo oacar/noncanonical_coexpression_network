@@ -95,9 +95,13 @@ cm_rho_998_cn<-getContingencyMatrix(TFsincommon,rho,cutoff_rf998,orf_info,compar
 
 #make plots
 getPlotdf<-function(cm){
-  cp = 100*(cm['1','1']/(cm['1','1']+cm['0','1']))
-  ncp = 100*(cm['1','0']/(cm['1','0']+cm['0','0']))
-  plot_df<-data.frame('coexpressed'=c('coexpressed pairs','not coexpressed pairs'),'percentage'=c(cp, ncp))
+  cp = (cm['1','1']/(cm['1','1']+cm['0','1']))
+  ncp = (cm['1','0']/(cm['1','0']+cm['0','0']))
+  plot_df<-data.frame('coexpressed'=c('coexpressed','not coexpressed'),
+                      'prop'=c(cp, ncp),'count'=c(cm['1','1'],cm['1','0']))
+  plot_df$se<-sqrt(plot_df$prop * (1 - plot_df$prop) / plot_df$count)
+  plot_df$prop<-plot_df$prop*100
+  plot_df$se<-plot_df$se*100
   return(plot_df)
 }
 
@@ -107,7 +111,7 @@ library(scales)
 library(rstatix)
 library(tibble)
 library(ggpubr)
-rho_hex<-'#DC0000B2'
+
 file_path<-'./20230106_figures/'
 significance_size <- 4 
 axis_title_size = 12
@@ -137,11 +141,14 @@ stats_nn<-pairwise_fisher_test(nnm, p.adjust.method = "holm") %>% add_column('pa
 #nn odds ratio = 3.8575 p-value <2.2e-16
 stats_tf<- bind_rows(stats_cc,stats_cn,stats_nn)
 
-pdf(sprintf('%sTFBS_Enrichment_rho_cc_cn_nn_998.pdf',file_path),width=4, height = 3)
-ggbarplot(plot_df, x="pair_type", y="percentage", xlab="ORF pair type",ylab ="% of pairs sharing a TF",
-          fill = "coexpressed", color=NA, palette = c('#BFBADA','#E32726'),
+
+pdf(sprintf('%sTFBS_Enrichment_rho_cc_cn_nn_998.pdf',file_path),width=3.5, height = 2.5)
+ggbarplot(plot_df, x="pair_type", y="prop", xlab="ORF pair type",ylab ="% of pairs with their promoter bound by a common TF",
+          fill = "coexpressed", color=NA, palette = c('#3FC1C9','#E32726'),
           label = FALSE,   legend = "bottom",
           position = position_dodge(0.8))+  rremove("xlab")+
+  geom_text(aes(label = format(plot_df$count, big.mark = ",")), size = 2.5, vjust = -0.5,hjust=0.5) +
+  geom_errorbar(aes(ymin = prop - se, ymax = prop + se), width = 0.2, color = "black") +
   stat_pvalue_manual(stats_tf, x='pair_type',label="p.adj.signif",y.position=40,size = significance_size)+
   font("x.text", size = axis_text_size) +
   font("y.text", size = axis_text_size) +
@@ -150,4 +157,3 @@ ggbarplot(plot_df, x="pair_type", y="percentage", xlab="ORF pair type",ylab ="% 
   font("legend.text", size=legend_text_size)+
   font("legend.title", size=legend_title_size)
 dev.off()
-
