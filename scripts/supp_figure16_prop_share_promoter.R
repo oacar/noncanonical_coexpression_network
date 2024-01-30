@@ -1,4 +1,4 @@
-#script to plot supplementary figure 14: Proportion of de novo ORFs that share a promoter with their neighboring conserved ORF.
+#script to plot supplementary figure 16: Proportion of de novo ORFs that share a promoter with their neighboring conserved ORF.
 
 library(dplyr)
 library(ggpubr)

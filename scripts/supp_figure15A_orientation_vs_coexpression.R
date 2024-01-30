@@ -1,4 +1,4 @@
-#script to plot supp figure 13A: x axis orientation of de novo ORF relative to conserved gene,
+#script to plot supp figure 15A: x axis orientation of de novo ORF relative to conserved gene,
 #y axis coexpression with neighbor
 
 library(dplyr)

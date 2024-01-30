@@ -1,4 +1,4 @@
-#script to plot supp figure 13B: boxplots of orientation vs biological process similarity
+#script to plot supp figure 15B: boxplots of orientation vs biological process similarity
 #omer.gsea_similarity_random data is generated in gsea_jaccard_random.r
 # omer.fgseas_slim_similarity data is generated in gsea_relevance_similarity.R
 
