@@ -5,7 +5,6 @@ library(RMariaDB)
 library(ggpubr)
 library(EGAD)
 #load orf annotation info
-#get ORF data
 
 conn <- dbConnect(MariaDB(),
                   usr = sql.usr,
