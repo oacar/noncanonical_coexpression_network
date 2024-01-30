@@ -95,3 +95,4 @@ cor_m_spqn <- normalize_correlation(as.matrix(rho_matrix), ave_exp=exp_df$mean_v
 rownames(cor_m_spqn)<-rownames(rho_matrix)
 colnames(cor_m_spqn)<-colnames(rho_matrix)
 saveRDS(cor_m_spqn,'spqn_rho_raw5_sample400_noNA.RDS')
+
